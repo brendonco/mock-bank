@@ -115,9 +115,6 @@ function AccountPage() {
           {transferFundAccount && (
             <p>{`Transferred ${formatAmount(transferAmount)} to ${payTo}.`}</p>
           )}
-          {/* {oweTo && (
-            <p>{`Owing ${formatAmount(oweTo?.amount)} to ${payTo}.`}</p>
-          )} */}
         </Tabs.Panel>
       </Tabs>
     </Card>

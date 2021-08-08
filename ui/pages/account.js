@@ -1,7 +1,11 @@
 import * as React from "react";
 import { useLogin } from "../context/login-context";
-import { Card, InputNumber, Button, Tabs } from "@supabase/ui";
-import { postTopupAmount } from "../actions/asyncActionCreators";
+import { Card, Input, InputNumber, Button, Tabs } from "@supabase/ui";
+import {
+  postTopupAmount,
+  fetchByAccount,
+  postTransferFund,
+} from "../actions/asyncActionCreators";
 import { updateAccount, logoutSuccessful } from "../actions/actionCreators";
 import formatAmount from "../utils/formatAmount";
 
@@ -11,6 +15,10 @@ function AccountPage() {
     dispatch,
   } = useLogin();
   const [amount, setTopup] = React.useState(0);
+  const [payTo, setPayTo] = React.useState(null);
+  const [payToAmount, setPayToAmount] = React.useState(0);
+  const [oweTo, setOweTo] = React.useState(null);
+  const [transferFundAccount, setTransferFundAccount] = React.useState(null);
 
   if (!authenticated) return null;
 
@@ -27,14 +35,59 @@ function AccountPage() {
     dispatch(updateAccount(updatedAmount));
   }
 
+  async function transferFund() {
+    if (!payTo) {
+      // required field
+    }
+
+    const data = {
+      name: payTo,
+    };
+
+    const payToAccount = (await fetchByAccount({ name: payTo })) || [];
+    const [payToAccountDetail] = payToAccount;
+
+    const { fromResponse, toResponse } = await postTransferFund(
+      accountDetail,
+      payToAccountDetail,
+      payToAmount
+    );
+
+    setTransferFundAccount(toResponse);
+
+    if (fromResponse.owe) {
+      const owe = fromResponse.owe.find((owe) => owe.id === toResponse.id);
+      setOweTo(owe);
+    }
+
+    dispatch(updateAccount(fromResponse));
+  }
+
   function logout() {
+    setOweTo(null);
+    setTransferFundAccount(null);
+
     dispatch(logoutSuccessful());
+  }
+
+  let transferAmount = payToAmount;
+
+  if (oweTo?.amount < payToAmount) {
+    transferAmount = payToAmount - oweTo?.amount;
   }
 
   return (
     <Card title="Account" titleExtra={<Button onClick={logout}>Logout</Button>}>
-      <div>Name: {accountDetail?.name}</div>
-      <div>Your balance is: {formatAmount(accountDetail?.balance)}</div>
+      <p>Name: {accountDetail?.name}</p>
+      <p>Your balance is: {formatAmount(accountDetail?.balance)}</p>
+      {accountDetail?.oweFrom &&
+        accountDetail?.oweFrom?.map((owe) => (
+          <p>{`Owing ${formatAmount(owe.amount)} from ${owe.name}`}</p>
+        ))}
+      {accountDetail?.owe &&
+        accountDetail?.owe?.map((owe) => (
+          <p>{`Owing ${formatAmount(owe.amount)} to ${owe.name}`}</p>
+        ))}
       <Tabs size="large" block>
         <Tabs.Panel id="topup" label="Topup">
           <InputNumber
@@ -44,7 +97,27 @@ function AccountPage() {
           <Button onClick={topUp}>Submit</Button>
         </Tabs.Panel>
         <Tabs.Panel id="pay" label="Pay">
-          Tab two content
+          <Input
+            label="Pay To"
+            onChange={(e) => {
+              setPayTo(e.target.value);
+              setTransferFundAccount(null);
+            }}
+          />
+          <InputNumber
+            label="Amount"
+            onChange={(e) => {
+              setPayToAmount(e.target.value);
+              setTransferFundAccount(null);
+            }}
+          />
+          <Button onClick={transferFund}>Submit</Button>
+          {transferFundAccount && (
+            <p>{`Transferred ${formatAmount(transferAmount)} to ${payTo}.`}</p>
+          )}
+          {/* {oweTo && (
+            <p>{`Owing ${formatAmount(oweTo?.amount)} to ${payTo}.`}</p>
+          )} */}
         </Tabs.Panel>
       </Tabs>
     </Card>

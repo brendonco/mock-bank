@@ -15,7 +15,7 @@ function LoginPage() {
   const [username, setUsername] = React.useState(null);
 
   if (authenticated) {
-    return <div>Welcome back {username} </div>;
+    return <p>{`Hello, ${username}!`} </p>;
   }
 
   async function loginUser() {
@@ -41,7 +41,9 @@ function LoginPage() {
   return (
     <>
       <Input label="Username" onChange={(e) => setUsername(e.target.value)} />
-      <Button onClick={loginUser}>Login</Button>
+      <p>
+        <Button onClick={loginUser}>Login</Button>
+      </p>
     </>
   );
 }

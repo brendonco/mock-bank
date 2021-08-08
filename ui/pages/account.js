@@ -94,7 +94,9 @@ function AccountPage() {
             label="Amount"
             onChange={(e) => setTopup(e.target.value)}
           />
-          <Button onClick={topUp}>Submit</Button>
+          <p>
+            <Button onClick={topUp}>Submit</Button>
+          </p>
         </Tabs.Panel>
         <Tabs.Panel id="pay" label="Pay">
           <Input
@@ -111,7 +113,9 @@ function AccountPage() {
               setTransferFundAccount(null);
             }}
           />
-          <Button onClick={transferFund}>Submit</Button>
+          <p>
+            <Button onClick={transferFund}>Submit</Button>
+          </p>
           {transferFundAccount && (
             <p>{`Transferred ${formatAmount(transferAmount)} to ${payTo}.`}</p>
           )}

@@ -9,7 +9,7 @@ function loginReducer(state, action) {
       return state;
     }
     case ActionTypes.REQUEST_LOGIN_SUCCESS: {
-      return { authenticated: true, account: action.account };
+      return { authenticated: true, account: action?.account };
     }
     case ActionTypes.REQUEST_LOGOUT_SUCCESS: {
       return { authenticated: false };
@@ -17,6 +17,8 @@ function loginReducer(state, action) {
     case ActionTypes.REQUEST_LOGIN_FAILURE: {
       return {
         authenticated: false,
+        usernameValidationMessage:
+          action?.validationResult?.usernameValidationMessage,
       };
     }
     case ActionTypes.UPDATE_ACCOUNT_BALANCE_SUCCESS: {

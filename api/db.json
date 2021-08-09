@@ -1,4 +1,14 @@
 {
   "accounts": [
+    {
+      "name": "alice",
+      "balance": 0,
+      "id": 1
+    },
+    {
+      "name": "bob",
+      "balance": 0,
+      "id": 2
+    }
   ]
 }

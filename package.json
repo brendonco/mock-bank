@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/brendonco/mock-bank#readme",
   "devDependencies": {
-    "concurrently": "^6.2.0"
+    "concurrently": "^6.2.0",
+    "whatwg-fetch": "^3.6.2"
   }
 }

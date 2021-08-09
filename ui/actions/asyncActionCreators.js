@@ -56,18 +56,6 @@ export const postTransferFund = async (from, to, transferAmount) => {
 
   if (currentAmount < 0 || currentAmount === 0) {
     if (from.owe) {
-      // oweList = from.owe.map((owe) => {
-      //   if (owe.id === to.id) {
-      //     return {
-      //       ...owe,
-      //       amount:
-      //         currentAmount === 0
-      //           ? Number(owe.amount) - Number(transferAmount)
-      //           : -currentAmount,
-      //     };
-      //   }
-      //   return owe;
-      // });
       oweList = updateOwe(from?.owe, to, currentAmount, transferAmount);
 
       fromResponse = await put(`${baseUrl}/${from.id}`, {

@@ -1,24 +1,48 @@
 import * as React from "react";
 import { useLogin } from "../context/login-context";
-import { loginSuccessful, createAccount } from "../actions/actionCreators";
+import {
+  loginSuccessful,
+  loginFailed,
+  createAccount,
+} from "../actions/actionCreators";
 import { Input, Button } from "@supabase/ui";
 import {
   fetchByAccount,
   postCreateAccount,
 } from "../actions/asyncActionCreators";
 
+export const validateLoginRequest = (credentials) => {
+  let result = {
+    isValid: true,
+    usernameValidationMessage: null,
+  };
+
+  if (!credentials.username) {
+    result.isValid = false;
+    result.usernameValidationMessage = "Username is required";
+  }
+
+  return result;
+};
+
 function LoginPage() {
   const {
-    state: { authenticated },
+    state: { authenticated, usernameValidationMessage },
     dispatch,
   } = useLogin();
   const [username, setUsername] = React.useState(null);
 
   if (authenticated) {
-    return <p>{`Hello, ${username}!`} </p>;
+    return <h2>{`Hello, ${username}!`} </h2>;
   }
 
   async function loginUser() {
+    const validateResult = validateLoginRequest({ username });
+
+    if (!validateResult.isValid) {
+      return dispatch(loginFailed(validateResult));
+    }
+
     const user = await fetchByAccount({ name: username });
 
     if (user.length === 0) {
@@ -40,7 +64,13 @@ function LoginPage() {
 
   return (
     <>
-      <Input label="Username" onChange={(e) => setUsername(e.target.value)} />
+      <Input
+        id="username"
+        name="username"
+        label="Username"
+        onChange={(e) => setUsername(e.target.value)}
+        error={usernameValidationMessage}
+      />
       <p>
         <Button onClick={loginUser}>Login</Button>
       </p>

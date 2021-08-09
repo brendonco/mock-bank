@@ -1,6 +1,20 @@
-import { screen, render, act, fireEvent } from "@testing-library/react";
+import {
+  screen,
+  render,
+  // userEvent,
+  fireEvent,
+  waitFor,
+  // act,
+} from "@testing-library/react";
 import { LoginPage, validateLoginRequest } from "../pages/login";
 import { LoginProvider } from "../context/login-context";
+
+const customRender = (ui, { providerProps, ...renderOptions }) => {
+  return render(
+    <LoginProvider {...providerProps}>{ui}</LoginProvider>,
+    renderOptions
+  );
+};
 
 jest.mock("next/router", () => ({
   useRouter() {
@@ -30,16 +44,60 @@ test("renders Login without crashing", () => {
   expect(screen.getByText(/login/i)).toBeInTheDocument();
 });
 
-test("Login validate input and provide error messages", async () => {
-  render(
-    <LoginProvider>
-      <LoginPage />
-    </LoginProvider>
-  );
+const setup = async () => {
+  const providerProps = {
+    value: {
+      state: {
+        authenticated: true,
+        account: [],
+      },
+      disptach: () => {},
+    },
+  };
 
-  await act(async () => {
+  customRender(<LoginPage />, { providerProps });
+
+  await waitFor(() => {
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: "" },
+    });
+
+    fireEvent.click(screen.getByText(/login/i));
+
+    const validateReqest = validateLoginRequest({ username: null });
+
+    expect(
+      screen.getByText(validateReqest.usernameValidationMessage)
+    ).toBeInTheDocument();
+  });
+};
+
+test("Login validate input and provide error messages", () => {
+  setup();
+});
+
+const setup2 = async () => {
+  const providerProps = {
+    value: {
+      state: {
+        authenticated: true,
+        account: [
+          {
+            name: "alice",
+            balance: 0,
+            id: 1,
+          },
+        ],
+      },
+      disptach: () => {},
+    },
+  };
+
+  customRender(<LoginPage />, { providerProps });
+
+  await waitFor(() => {
+    fireEvent.change(screen.getByLabelText(/username/i), {
+      target: { value: "alice" },
     });
 
     fireEvent.click(screen.getByText(/login/i));
@@ -48,32 +106,10 @@ test("Login validate input and provide error messages", async () => {
   const validateReqest = validateLoginRequest({ username: null });
 
   expect(
-    screen.getByText(validateReqest.usernameValidationMessage)
+    await screen.getByText(validateReqest.usernameValidationMessage)
   ).toBeInTheDocument();
+};
+
+test("should submit when form inputs contain text", () => {
+  setup2();
 });
-
-// test("should submit when form inputs contain text", async () => {
-//   render(
-//     <LoginProvider>
-//       <LoginPage />
-//     </LoginProvider>
-//   );
-
-//   const username = "alice";
-
-//   await act(async () => {
-//     fireEvent.change(screen.getByLabelText(/username/i), {
-//       target: { value: username },
-//     });
-//   });
-
-//   await act(async () => {
-//     fireEvent.click(screen.getByText(/login/i));
-//   });
-
-//   const validateReqest = validateLoginRequest({ username: null });
-
-//   expect(
-//     screen.getByText(validateReqest.usernameValidationMessage)
-//   ).not.toBeInTheDocument();
-// });

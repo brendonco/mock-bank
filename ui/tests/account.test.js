@@ -1,5 +1,5 @@
 import { screen, render, waitFor } from "@testing-library/react";
-import { LoginProvider } from "../context/login-context";
+import { LoginProvider, LoginContext } from "../context/login-context";
 import { LoginPage } from "../pages/login";
 import { AccountProvider } from "../context/account-context";
 import { AccountPage } from "../pages/account";
@@ -30,38 +30,38 @@ jest.mock("next/router", () => ({
   },
 }));
 
-const setup = async () => {
-  const providerProps = {
-    value: {
-      state: {
-        authenticated: true,
-        account: [
-          {
-            name: "alice",
-            balance: 0,
-            id: 1,
-          },
-        ],
-      },
-      disptach: () => {},
+const providerProps = {
+  authenticated: true,
+  account: [
+    {
+      name: "alice",
+      balance: 0,
+      id: 1,
     },
-  };
+  ],
+};
 
-  customRender(
-    <>
-      <LoginPage />
-      <AccountProvider>
-        <AccountPage />
-      </AccountProvider>
-    </>,
-    { providerProps }
-  );
+const setup = async () => {
+  customRender(<LoginPage />, { providerProps });
 
   await userEvent.type(screen.getByLabelText(/username/i), "alice");
 };
 
 test("AccountPage - should have welcome message", async () => {
-  setup();
+  // setup();
+
+  const wrapper = ({ children }) => (
+    <LoginProvider {...providerProps}>
+      <LoginPage />
+      <AccountProvider {...providerProps}>{children}</AccountProvider>
+    </LoginProvider>
+  );
+
+  render(<AccountPage />, {
+    wrapper,
+  });
+
+  await userEvent.type(screen.getByLabelText(/username/i), "alice");
 
   userEvent.click(screen.getByText(/login/i));
 
@@ -70,4 +70,17 @@ test("AccountPage - should have welcome message", async () => {
       screen.getByRole("heading", { name: "Hello, alice!" })
     ).toBeInTheDocument();
   });
+
+  render(
+    <>
+      <AccountPage />
+    </>,
+    { wrapper: LoginProvider }
+  );
+
+  const name = screen.getByText(/Name:/i);
+  expect(name).toHaveTextContent("Name:");
+
+  const balance = screen.getByText(/your balance is:/i);
+  expect(balance).toHaveTextContent("Your balance is: $NaN");
 });

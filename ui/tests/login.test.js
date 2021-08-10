@@ -1,11 +1,4 @@
-import {
-  screen,
-  render,
-  // userEvent,
-  fireEvent,
-  waitFor,
-  // act,
-} from "@testing-library/react";
+import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 import { LoginPage, validateLoginRequest } from "../pages/login";
 import { LoginProvider } from "../context/login-context";
 

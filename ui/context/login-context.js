@@ -21,10 +21,25 @@ function loginReducer(state, action) {
           action?.validationResult?.usernameValidationMessage,
       };
     }
+    case ActionTypes.TRANSFER_FUNDS_REQUEST_FAILED: {
+      return {
+        ...state,
+        accountValidationMessage: action?.validationResult,
+      };
+    }
+
+    case ActionTypes.UPDATE_ACCOUNT_BALANCE_FAILED: {
+      return {
+        ...state,
+        accountTopupValidationMessage: action?.validationResult,
+      };
+    }
     case ActionTypes.UPDATE_ACCOUNT_BALANCE_SUCCESS: {
       return {
         ...state,
         account: [action.account],
+        accountValidationMessage: null,
+        accountTopupValidationMessage: null,
       };
     }
     case ActionTypes.CREATE_ACCOUNT_SUCCESS: {

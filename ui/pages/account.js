@@ -6,12 +6,26 @@ import {
   fetchByAccount,
   postTransferFund,
 } from "../actions/asyncActionCreators";
-import { updateAccount, logoutSuccessful } from "../actions/actionCreators";
+import {
+  updateAccount,
+  logoutSuccessful,
+  transferFundFailed,
+  updateAccountBalanceFailed,
+} from "../actions/actionCreators";
 import formatAmount from "../utils/formatAmount";
+import {
+  validateAccountRequest,
+  validateAccountTopupRequest,
+} from "./account-validation";
 
 function AccountPage() {
   const {
-    state: { authenticated, account },
+    state: {
+      authenticated,
+      account,
+      accountValidationMessage,
+      accountTopupValidationMessage,
+    },
     dispatch,
   } = useLogin();
   const [amount, setTopup] = React.useState(0);
@@ -25,6 +39,14 @@ function AccountPage() {
   const [accountDetail] = account;
 
   async function topUp() {
+    const validateResult = validateAccountTopupRequest({
+      topUp: amount,
+    });
+
+    if (!validateResult.isValid) {
+      return dispatch(updateAccountBalanceFailed(validateResult));
+    }
+
     const data = {
       ...accountDetail,
       balance: Number(accountDetail.balance) + Number(amount),
@@ -36,8 +58,14 @@ function AccountPage() {
   }
 
   async function transferFund() {
-    if (!payTo) {
-      // required field
+    const validateResult = validateAccountRequest({
+      payTo,
+      payToAmount,
+      currentUser: accountDetail?.name,
+    });
+
+    if (!validateResult.isValid) {
+      return dispatch(transferFundFailed(validateResult));
     }
 
     const data = {
@@ -93,9 +121,9 @@ function AccountPage() {
           <InputNumber
             id="topup-amount"
             name="topup-amount"
-            aria-label="topup-amount"
             label="Topup Amount"
             onChange={(e) => setTopup(e.target.value)}
+            error={accountTopupValidationMessage?.topUpValidationMessage}
           />
           <p>
             <Button onClick={topUp}>Topup</Button>
@@ -108,6 +136,7 @@ function AccountPage() {
               setPayTo(e.target.value);
               setTransferFundAccount(null);
             }}
+            error={accountValidationMessage?.payToValidationMessage}
           />
           <InputNumber
             label="Amount to pay"
@@ -115,6 +144,7 @@ function AccountPage() {
               setPayToAmount(e.target.value);
               setTransferFundAccount(null);
             }}
+            error={accountValidationMessage?.payToAmountValidationMessage}
           />
           <p>
             <Button onClick={transferFund}>Pay</Button>

@@ -24,6 +24,11 @@ export const updateAccount = (account) => ({
   account,
 });
 
+export const updateAccountBalanceFailed = (validationResult) => ({
+  type: types.UPDATE_ACCOUNT_BALANCE_FAILED,
+  validationResult,
+});
+
 export const createAccount = (account) => ({
   type: types.CREATE_ACCOUNT_SUCCESS,
   account,
@@ -31,5 +36,10 @@ export const createAccount = (account) => ({
 
 export const failedCreateAccount = (validationResult) => ({
   type: types.CREATE_ACCOUNT_FAILED,
+  validationResult,
+});
+
+export const transferFundFailed = (validationResult) => ({
+  type: types.TRANSFER_FUNDS_REQUEST_FAILED,
   validationResult,
 });

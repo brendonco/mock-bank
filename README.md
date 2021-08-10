@@ -12,3 +12,5 @@ yarn start
 ```
 
 The above will start the UI on port 3000 and start the API on port 3001.
+
+API project uses a fake REST API thanks to [json-server](https://github.com/typicode/json-server) for 30 seconds setup.

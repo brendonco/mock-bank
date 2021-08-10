@@ -91,11 +91,14 @@ function AccountPage() {
       <Tabs size="large" block>
         <Tabs.Panel id="topup" label="Topup">
           <InputNumber
-            label="Amount"
+            id="topup-amount"
+            name="topup-amount"
+            aria-label="topup-amount"
+            label="Topup Amount"
             onChange={(e) => setTopup(e.target.value)}
           />
           <p>
-            <Button onClick={topUp}>Submit</Button>
+            <Button onClick={topUp}>Topup</Button>
           </p>
         </Tabs.Panel>
         <Tabs.Panel id="pay" label="Pay">
@@ -107,14 +110,14 @@ function AccountPage() {
             }}
           />
           <InputNumber
-            label="Amount"
+            label="Amount to pay"
             onChange={(e) => {
               setPayToAmount(e.target.value);
               setTransferFundAccount(null);
             }}
           />
           <p>
-            <Button onClick={transferFund}>Submit</Button>
+            <Button onClick={transferFund}>Pay</Button>
           </p>
           {transferFundAccount && (
             <p>{`Transferred ${formatAmount(transferAmount)} to ${payTo}.`}</p>

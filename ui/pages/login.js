@@ -27,13 +27,14 @@ export const validateLoginRequest = (credentials) => {
 
 function LoginPage() {
   const {
-    state: { authenticated, usernameValidationMessage },
+    state: { authenticated, usernameValidationMessage, account },
     dispatch,
   } = useLogin();
   const [username, setUsername] = React.useState(null);
+  const [accountDetail] = account || [];
 
   if (authenticated) {
-    return <h2>{`Hello, ${username}!`} </h2>;
+    return <h2>{`Hello, ${accountDetail?.name}!`} </h2>;
   }
 
   async function loginUser() {

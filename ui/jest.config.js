@@ -1,4 +1,5 @@
 module.exports = {
+  // moduleDirectories: ["node_modules", "tests", __dirname],
   testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
   setupFilesAfterEnv: [
     "<rootDir>/setupTests.js",
